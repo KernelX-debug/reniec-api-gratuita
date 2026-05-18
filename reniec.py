@@ -13,6 +13,7 @@ RENIEC_TOKEN = os.getenv("RENIEC_TOKEN")
 
 API_URL = "https://api.decolecta.com/v1/reniec/dni"
 
+GUILD_ID = 964202915868844042
 
 intents = discord.Intents.default()
 
@@ -23,11 +24,17 @@ bot = commands.Bot(
 
 @bot.event
 async def on_ready():
+
     print(f"[+] Bot conectado como {bot.user}")
 
     try:
-        synced = await bot.tree.sync()
-        print(f"[+] Slash commands sincronizados: {len(synced)}")
+
+        guild = discord.Object(id=GUILD_ID)
+
+        synced = await bot.tree.sync(guild=guild)
+
+        print(f"[+] Comandos sincronizados: {len(synced)}")
+
     except Exception as e:
         print(f"[ERROR] {e}")
 
@@ -43,6 +50,7 @@ def consultar_dni(numero_dni):
     }
 
     try:
+
         response = requests.get(
             API_URL,
             headers=headers,
@@ -53,20 +61,21 @@ def consultar_dni(numero_dni):
         if response.status_code == 200:
             return response.json()
 
+        print(f"[ERROR API] {response.text}")
         return None
 
     except Exception as e:
-        print(f"[ERROR API] {e}")
+        print(f"[ERROR REQUEST] {e}")
         return None
 
 @bot.tree.command(
     name="dni",
-    description="Consulta información ciudadana"
+    description="Consulta información ciudadana",
+    guild=discord.Object(id=GUILD_ID)
 )
 @app_commands.describe(numero="Número de DNI")
 async def dni(interaction: discord.Interaction, numero: str):
 
-    # Validación
     if not numero.isdigit() or len(numero) != 8:
 
         await interaction.response.send_message(
@@ -86,7 +95,6 @@ async def dni(interaction: discord.Interaction, numero: str):
         )
         return
 
-
     embed = discord.Embed(
         title="🛡️ SISTEMA NACIONAL DE IDENTIFICACIÓN",
         description=(
@@ -96,7 +104,7 @@ async def dni(interaction: discord.Interaction, numero: str):
             "NIVEL DE SEGURIDAD: RESERVADO"
             "```"
         ),
-        color=0x0f0f0f
+        color=0x111111
     )
 
     embed.add_field(
@@ -130,7 +138,7 @@ async def dni(interaction: discord.Interaction, numero: str):
     )
 
     embed.set_footer(
-        text="Sistema Integrado de Verificación"
+        text="Sistema Integrado de Verificación Nacional"
     )
 
     await interaction.followup.send(embed=embed)
