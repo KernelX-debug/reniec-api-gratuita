@@ -22,22 +22,6 @@ bot = commands.Bot(
     intents=intents
 )
 
-@bot.event
-async def on_ready():
-
-    print(f"[+] Bot conectado como {bot.user}")
-
-    try:
-
-        guild = discord.Object(id=GUILD_ID)
-
-        synced = await bot.tree.sync(guild=guild)
-
-        print(f"[+] Comandos sincronizados: {len(synced)}")
-
-    except Exception as e:
-        print(f"[ERROR] {e}")
-
 def consultar_dni(numero_dni):
 
     headers = {
@@ -61,17 +45,15 @@ def consultar_dni(numero_dni):
         if response.status_code == 200:
             return response.json()
 
-        print(f"[ERROR API] {response.text}")
         return None
 
     except Exception as e:
-        print(f"[ERROR REQUEST] {e}")
+        print(e)
         return None
 
 @bot.tree.command(
     name="dni",
-    description="Consulta información ciudadana",
-    guild=discord.Object(id=GUILD_ID)
+    description="Consulta información ciudadana"
 )
 @app_commands.describe(numero="Número de DNI")
 async def dni(interaction: discord.Interaction, numero: str):
@@ -137,10 +119,24 @@ async def dni(interaction: discord.Interaction, numero: str):
         inline=False
     )
 
-    embed.set_footer(
-        text="Sistema Integrado de Verificación Nacional"
-    )
-
     await interaction.followup.send(embed=embed)
+
+@bot.event
+async def on_ready():
+
+    print(f"[+] Bot conectado como {bot.user}")
+
+    try:
+
+        guild = discord.Object(id=GUILD_ID)
+
+        bot.tree.copy_global_to(guild=guild)
+
+        synced = await bot.tree.sync(guild=guild)
+
+        print(f"[+] Comandos sincronizados: {len(synced)}")
+
+    except Exception as e:
+        print(e)
 
 bot.run(DISCORD_TOKEN)
