@@ -4,6 +4,8 @@ Bot de Discord desarrollado en Python para consultar información ciudadana medi
 
 El bot permite realizar búsquedas por DNI utilizando comandos slash (`/dni`) y muestra los resultados mediante embeds con formato institucional.
 
+Necesidad de python 3.13
+
 # API Utilizada
 
 Proveedor API:
@@ -32,7 +34,7 @@ cd reniec-api-gratuita
 ## 2. Instalar dependencias
 
 ```powershell
-pip install -r requirements.txt
+py -3.13 -m pip install -r requirements.txt
 ```
 
 ## 3. Configurar variables de entorno
@@ -47,7 +49,7 @@ RENIEC_TOKEN=TU_TOKEN_RENIEC
 # Ejecución
 
 ```powershell
-python reniec.py
+py -3.13 reniec.py
 ```
 
 **Comando Disponible**
